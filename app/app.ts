@@ -8,8 +8,8 @@ export const startServer = async () => {
   try {
     const app = express();
     await mongoConnection();
-    await checkAdmin();
-    await populate();
+    //await checkAdmin();
+    //await populate();
     registerRoutes(app);
     const { PORT } = process.env;
     app.listen(PORT);
