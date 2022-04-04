@@ -23,12 +23,9 @@ const createUser = async (user: IUser) => {
       from: "testingformail797@gmail.com",
       to: userData.email,
       subject: "Account Sucessfully Created",
-      text: `Dear,${userData.name}. Your Account has been created here are the login credentials. EmployeeId: ${userData.employeeId} Password:${password}`,
+      text: `Dear,${userData.name}. Your Account has been created.\nHere are the login credentials.\nEmployeeId: ${userData.employeeId} Password:${password}`,
     };
-    const a = await sgMail.send(msg);
-    if (a) {
-      console.log("Email sent");
-    }
+    await sgMail.send(msg);
     return result;
   } catch (error) {
     throw error;
@@ -41,53 +38,28 @@ const authenticateUser = async (employeeId: string, password: string) => {
     if (!user) throw new Error("User doesn't exists");
     const doMatch = await compare(password, user.password);
     if (!doMatch) throw new Error("Invalid Password");
-    const result = generateToken(user);
-    return result;
+    const token = generateToken(user);
+    const role = user.role;
+
+    return { token, role };
   } catch (error) {
     throw error;
   }
 };
 
 const displayUsers = async (roles: string) => {
-  try {
-    if (roles) {
-      const result = await userRepo.getbyRole(roles);
-      return result;
-    } else {
-      const result = await userRepo.getAll();
-      return result;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
-
-const displayall = async () => {
-  try {
+  if (roles) {
+    const result = await userRepo.getbyRole(roles);
+    return result;
+  } else {
     const result = await userRepo.getAll();
     return result;
-  } catch (error) {
-    throw error;
   }
 };
 
-const editUser = async (updated_data: IUser) => {
-  try {
-    const result = await userRepo.update(updated_data);
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
+const editUser = (updated_data: IUser) => userRepo.update(updated_data);
 
-const deleteUser = async (employeeId: string) => {
-  try {
-    const result = await userRepo.deleteOne(employeeId);
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
+const deleteUser = (employeeId: string) => userRepo.deleteOne(employeeId);
 
 export default {
   createUser,
@@ -95,5 +67,4 @@ export default {
   displayUsers,
   editUser,
   deleteUser,
-  displayall,
 };
